@@ -1,0 +1,508 @@
+-- ==========================================
+--        KING OF DARKNESS HUB (COMBAT EDITION)
+-- ==========================================
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+-- ------------------------------------------
+-- ระบบจัดการภาษาและธีม (Language & Theme System)
+-- ------------------------------------------
+local CurrentLang = "TH"
+local CurrentThemeColor = Color3.fromRGB(220, 35, 35) -- สีแดงหลักประจำค่าย
+
+local Dictionary = {
+    TH = {
+        Title = "KING OF DARKNESS",
+        TabMain = "🚀   Main / ทั่วไป",
+        TabESP = "👀   ESP / มองทะลุ",
+        TabTools = "🛠️   Tools / เครื่องมือ",
+        TabCombat = "🗡️   Combat / โจมตี",
+        TabSettings = "⚙️   Settings / ตั้งค่า",
+        
+        -- Main
+        FlyTitle = "Fly GUI V3",
+        FlySub = "เปิดใช้งานสคริปต์บิน",
+        SpeedTitle = "ความเร็ววิ่ง",
+        SpeedSub = "ปรับความเร็ว 1 ถึง 500",
+        InfJumpTitle = "กระโดดไม่จำกัด",
+        InfJumpSub = "Infinite Jump กระโดดกลางอากาศ",
+        NoclipTitle = "เดินทะลุกำแพง",
+        NoclipSub = "Noclip ทะลุสิ่งกีดขวาง",
+        InvisTitle = "ฟังก์ชั่นล่องหน",
+        InvisSub = "Invisible Man Script",
+        
+        -- ESP
+        EspPlayerTitle = "มองทะลุ ผู้เล่น",
+        EspPlayerSub = "แสดงกรอบ Highlight ทะลุกำแพงบนตัวผู้เล่น",
+        EspPlayerTracerTitle = "เส้น ESP ผู้เล่น",
+        EspPlayerTracerSub = "วาดเส้นเชื่อมจากหน้าจอไปยังตัวผู้เล่น",
+        EspNpcTitle = "มองทะลุ NPC / บอท",
+        EspNpcSub = "แสดงกรอบ Highlight ทะลุกำแพงบนตัว NPC",
+        EspNpcTracerTitle = "เส้น ESP NPC / บอท",
+        EspNpcTracerSub = "วาดเส้นเชื่อมจากหน้าจอไปยังตัว NPC",
+
+        -- Tools
+        FloatTitle = "Float / ลอยตัว",
+        FloatSub = "ล็อคตัวให้ลอยอยู่กับที่กลางอากาศ",
+        XrayTitle = "X-Ray / มองทะลุแมพ",
+        XraySub = "ปรับบล็อกและฉากให้โปร่งใส",
+        TpToolTitle = "Teleport Tool / อุปกรณ์วาร์ป",
+        TpToolSub = "รับเครื่องมือ คลิกที่ไหนวาร์ปไปที่นั่น",
+        SwimTitle = "Air Swim / ว่ายน้ำในอากาศ",
+        SwimSub = "เปิดโหมดว่ายน้ำอิสระกลางอากาศ",
+
+        -- Combat
+        AimPlayerTitle = "ล็อคหัวผู้เล่น⚔️",
+        AimPlayerSub = "Aimbot ล็อคเป้าหมายไปที่หัวของผู้เล่นที่ใกล้ที่สุด",
+        HitboxPlayerTitle = "ขยาย Hitbox ผู้เล่น⚔️",
+        HitboxPlayerSub = "ขยายขนาดตัวผู้เล่นให้โจมตีโดนง่ายขึ้น",
+        AimNpcTitle = "ล็อคหัว NPC / บอท⚔️",
+        AimNpcSub = "Aimbot ล็อคเป้าหมายไปที่หัวของ NPC / บอทที่ใกล้ที่สุด",
+        HitboxNpcTitle = "ขยาย Hitbox NPC / บอท⚔️",
+        HitboxNpcSub = "ขยายขนาดตัว NPC / บอทให้โจมตีโดนง่ายขึ้น",
+
+        -- Settings
+        LangTitle = "สลับภาษา UI",
+        LangSub = "เปลี่ยนภาษา (TH / EN)",
+        ThemeTitle = "สีธีมหลัก UI",
+        ThemeSub = "เลือกสีปุ่มและเส้นขอบไฮไลต์",
+        BtnEnable = "เปิดใช้งาน",
+        BtnGet = "รับไอเทม",
+        BtnOn = "เปิดอยู่",
+        BtnOff = "ปิดอยู่"
+    },
+    EN = {
+        Title = "KING OF DARKNESS",
+        TabMain = "🚀   Main",
+        TabESP = "👀   ESP System",
+        TabTools = "🛠️   Tools",
+        TabCombat = "🗡️   Combat",
+        TabSettings = "⚙️   Settings",
+        
+        -- Main
+        FlyTitle = "Fly GUI V3",
+        FlySub = "Enable Flying Script",
+        SpeedTitle = "WalkSpeed",
+        SpeedSub = "Adjust Speed (1 to 500)",
+        InfJumpTitle = "Infinite Jump",
+        InfJumpSub = "Jump continuously in mid-air",
+        NoclipTitle = "Noclip",
+        NoclipSub = "Pass through solid walls",
+        InvisTitle = "Invisibility",
+        InvisSub = "Invisible Man Script",
+        
+        -- ESP
+        EspPlayerTitle = "Player Chams (ESP)",
+        EspPlayerSub = "Highlight player models through walls",
+        EspPlayerTracerTitle = "Player Tracers",
+        EspPlayerTracerSub = "Draw tracer lines to players",
+        EspNpcTitle = "NPC / Bot Chams",
+        EspNpcSub = "Highlight NPC models through walls",
+        EspNpcTracerTitle = "NPC / Bot Tracers",
+        EspNpcTracerSub = "Draw tracer lines to NPCs",
+
+        -- Tools
+        FloatTitle = "Float Mode",
+        FloatSub = "Freeze & float character in mid-air",
+        XrayTitle = "X-Ray Vision",
+        XraySub = "Make map blocks transparent",
+        TpToolTitle = "Teleport Tool",
+        TpToolSub = "Get tool to click-teleport anywhere",
+        SwimTitle = "Air Swim Mode",
+        SwimSub = "Swim freely in mid-air",
+
+        -- Combat
+        AimPlayerTitle = "Player Aimbot⚔️",
+        AimPlayerSub = "Lock camera to closest player head",
+        HitboxPlayerTitle = "Expand Player Hitbox⚔️",
+        HitboxPlayerSub = "Enlarge player hitboxes for easy hits",
+        AimNpcTitle = "NPC / Bot Aimbot⚔️",
+        AimNpcSub = "Lock camera to closest NPC head",
+        HitboxNpcTitle = "Expand NPC Hitbox⚔️",
+        HitboxNpcSub = "Enlarge NPC hitboxes for easy hits",
+
+        -- Settings
+        LangTitle = "UI Language",
+        LangSub = "Switch Language (TH / EN)",
+        ThemeTitle = "Accent Theme Color",
+        ThemeSub = "Select highlight & outline color",
+        BtnEnable = "Enable",
+        BtnGet = "Get Tool",
+        BtnOn = "ENABLED",
+        BtnOff = "DISABLED"
+    }
+}
+
+-- ------------------------------------------
+-- 1. สร้าง GUI หลัก
+-- ------------------------------------------
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "KingOfDarkness_UI"
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ResetOnSpawn = false
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Size = UDim2.new(0, 560, 0, 420)
+MainFrame.Position = UDim2.new(0.5, -280, 0.5, -210)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 12, 12)
+MainFrame.ClipsDescendants = true
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Parent = ScreenGui
+
+local UiScaleObj = Instance.new("UIScale")
+UiScaleObj.Scale = 1.0
+UiScaleObj.Parent = MainFrame
+
+local MainCorner = Instance.new("UICorner")
+MainCorner.CornerRadius = UDim.new(0, 10)
+MainCorner.Parent = MainFrame
+
+local MainStroke = Instance.new("UIStroke")
+MainStroke.Color = CurrentThemeColor
+MainStroke.Thickness = 2
+MainStroke.Parent = MainFrame
+
+-- TopBar
+local TopBar = Instance.new("Frame")
+TopBar.Size = UDim2.new(1, 0, 0, 45)
+TopBar.BackgroundColor3 = Color3.fromRGB(24, 16, 16)
+TopBar.Parent = MainFrame
+
+local TitleText = Instance.new("TextLabel")
+TitleText.Size = UDim2.new(0, 250, 1, 0)
+TitleText.Position = UDim2.new(0, 15, 0, 0)
+TitleText.Text = Dictionary[CurrentLang].Title
+TitleText.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleText.TextSize = 18
+TitleText.Font = Enum.Font.GothamBlack
+TitleText.TextXAlignment = Enum.TextXAlignment.Left
+TitleText.BackgroundTransparency = 1
+TitleText.Parent = TopBar
+
+local CloseBtn = Instance.new("TextButton")
+CloseBtn.Size = UDim2.new(0, 28, 0, 28)
+CloseBtn.Position = UDim2.new(1, -35, 0.5, -14)
+CloseBtn.BackgroundColor3 = Color3.fromRGB(40, 18, 18)
+CloseBtn.Text = "✕"
+CloseBtn.TextColor3 = Color3.fromRGB(255, 70, 70)
+CloseBtn.TextSize = 13
+CloseBtn.Font = Enum.Font.GothamBold
+CloseBtn.Parent = TopBar
+Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(0, 6)
+
+-- Sidebar (เมนูด้านข้าง)
+local Sidebar = Instance.new("Frame")
+Sidebar.Size = UDim2.new(0, 145, 1, -55)
+Sidebar.Position = UDim2.new(0, 10, 0, 50)
+Sidebar.BackgroundColor3 = Color3.fromRGB(20, 14, 14)
+Sidebar.Parent = MainFrame
+Instance.new("UICorner", Sidebar).CornerRadius = UDim.new(0, 8)
+
+local SidebarList = Instance.new("UIListLayout")
+SidebarList.Parent = Sidebar
+SidebarList.SortOrder = Enum.SortOrder.LayoutOrder
+SidebarList.Padding = UDim.new(0, 6)
+SidebarList.HorizontalAlignment = Enum.HorizontalAlignment.Center
+
+local SidebarPadding = Instance.new("UIPadding")
+SidebarPadding.Parent = Sidebar
+SidebarPadding.PaddingTop = UDim.new(0, 8)
+
+-- ปุ่ม Tab ทั้ง 5
+local function CreateTabButton(text)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(1, -14, 0, 30)
+    btn.BackgroundColor3 = Color3.fromRGB(35, 25, 25)
+    btn.BackgroundTransparency = 0.5
+    btn.Text = text
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.TextSize = 11
+    btn.Font = Enum.Font.GothamBold
+    btn.TextXAlignment = Enum.TextXAlignment.Left
+    btn.Parent = Sidebar
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 6)
+    return btn
+end
+
+local Tab1Btn = CreateTabButton(Dictionary[CurrentLang].TabMain)
+Tab1Btn.BackgroundColor3 = CurrentThemeColor
+Tab1Btn.BackgroundTransparency = 0.2
+Tab1Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+local Tab2Btn = CreateTabButton(Dictionary[CurrentLang].TabESP)
+local Tab3Btn = CreateTabButton(Dictionary[CurrentLang].TabTools)
+local Tab4Btn = CreateTabButton(Dictionary[CurrentLang].TabCombat)
+local Tab5Btn = CreateTabButton(Dictionary[CurrentLang].TabSettings)
+
+-- Content Box
+local ContentBox = Instance.new("Frame")
+ContentBox.Size = UDim2.new(1, -175, 1, -55)
+ContentBox.Position = UDim2.new(0, 165, 0, 50)
+ContentBox.BackgroundColor3 = Color3.fromRGB(14, 10, 10)
+ContentBox.Parent = MainFrame
+Instance.new("UICorner", ContentBox).CornerRadius = UDim.new(0, 8)
+
+-- Scroll Containers สำหรับทั้ง 5 แท็บ
+local function CreateScrollFrame()
+    local sc = Instance.new("ScrollingFrame")
+    sc.Size = UDim2.new(1, -16, 1, -16)
+    sc.Position = UDim2.new(0, 8, 0, 8)
+    sc.BackgroundTransparency = 1
+    sc.BorderSizePixel = 0
+    sc.ScrollBarThickness = 3
+    sc.ScrollBarImageColor3 = CurrentThemeColor
+    sc.CanvasSize = UDim2.new(0, 0, 0, 0)
+    sc.AutomaticCanvasSize = Enum.AutomaticSize.Y
+    sc.Visible = false
+    sc.Parent = ContentBox
+    Instance.new("UIListLayout", sc).Padding = UDim.new(0, 10)
+    return sc
+end
+
+local MainScroll = CreateScrollFrame()
+MainScroll.Visible = true
+local EspScroll = CreateScrollFrame()
+local ToolsScroll = CreateScrollFrame()
+local CombatScroll = CreateScrollFrame()
+local SettingsScroll = CreateScrollFrame()
+
+-- ------------------------------------------
+-- 2. ฟังก์ชันสร้างการ์ดเมนู
+-- ------------------------------------------
+local AccentStrokes = {MainStroke}
+local AccentButtons = {Tab1Btn}
+
+local function CreateCard(parent, titleText, subText)
+    local card = Instance.new("Frame")
+    card.Size = UDim2.new(1, -6, 0, 65)
+    card.BackgroundColor3 = Color3.fromRGB(24, 18, 18)
+    card.Parent = parent
+
+    Instance.new("UICorner", card).CornerRadius = UDim.new(0, 6)
+    local stroke = Instance.new("UIStroke")
+    stroke.Color = CurrentThemeColor
+    stroke.Thickness = 1
+    stroke.Parent = card
+    table.insert(AccentStrokes, stroke)
+
+    local tLbl = Instance.new("TextLabel")
+    tLbl.Name = "TitleLbl"
+    tLbl.Size = UDim2.new(0.55, 0, 0, 22)
+    tLbl.Position = UDim2.new(0, 12, 0, 8)
+    tLbl.Text = titleText
+    tLbl.TextColor3 = Color3.fromRGB(255, 255, 255)
+    tLbl.TextSize = 13
+    tLbl.Font = Enum.Font.GothamBold
+    tLbl.TextXAlignment = Enum.TextXAlignment.Left
+    tLbl.BackgroundTransparency = 1
+    tLbl.Parent = card
+
+    local sLbl = Instance.new("TextLabel")
+    sLbl.Name = "SubLbl"
+    sLbl.Size = UDim2.new(0.55, 0, 0, 18)
+    sLbl.Position = UDim2.new(0, 12, 0, 30)
+    sLbl.Text = subText
+    sLbl.TextColor3 = Color3.fromRGB(160, 160, 160)
+    sLbl.TextSize = 11
+    sLbl.Font = Enum.Font.Gotham
+    sLbl.TextXAlignment = Enum.TextXAlignment.Left
+    sLbl.BackgroundTransparency = 1
+    sLbl.Parent = card
+
+    return card
+end
+
+-- ------------------------------------------
+-- 3. TAB 1: MAIN
+-- ------------------------------------------
+local FlyCard = CreateCard(MainScroll, Dictionary[CurrentLang].FlyTitle, Dictionary[CurrentLang].FlySub)
+local FlyBtn = Instance.new("TextButton")
+FlyBtn.Size = UDim2.new(0, 90, 0, 32)
+FlyBtn.Position = UDim2.new(1, -102, 0.5, -16)
+FlyBtn.BackgroundColor3 = CurrentThemeColor
+FlyBtn.Text = Dictionary[CurrentLang].BtnEnable
+FlyBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+FlyBtn.Font = Enum.Font.GothamBold
+FlyBtn.TextSize = 12
+FlyBtn.Parent = FlyCard
+Instance.new("UICorner", FlyBtn).CornerRadius = UDim.new(0, 6)
+table.insert(AccentButtons, FlyBtn)
+
+FlyBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+    end)
+end)
+
+local currentWalkSpeed = 16
+local SpeedCard = CreateCard(MainScroll, Dictionary[CurrentLang].SpeedTitle, Dictionary[CurrentLang].SpeedSub)
+local SpeedInput = Instance.new("TextBox")
+SpeedInput.Size = UDim2.new(0, 90, 0, 32)
+SpeedInput.Position = UDim2.new(1, -102, 0.5, -16)
+SpeedInput.BackgroundColor3 = Color3.fromRGB(35, 22, 22)
+SpeedInput.Text = "16"
+SpeedInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+SpeedInput.Font = Enum.Font.GothamBold
+SpeedInput.TextSize = 12
+SpeedInput.Parent = SpeedCard
+Instance.new("UICorner", SpeedInput).CornerRadius = UDim.new(0, 6)
+
+local SpeedStroke = Instance.new("UIStroke")
+SpeedStroke.Color = CurrentThemeColor
+SpeedStroke.Thickness = 1
+SpeedStroke.Parent = SpeedInput
+table.insert(AccentStrokes, SpeedStroke)
+
+SpeedInput.FocusLost:Connect(function()
+    local num = tonumber(SpeedInput.Text)
+    if num then
+        num = math.clamp(num, 1, 500)
+        currentWalkSpeed = num
+        SpeedInput.Text = tostring(num)
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+            LocalPlayer.Character.Humanoid.WalkSpeed = num
+        end
+    end
+end)
+
+local infJumpEnabled = false
+local InfJumpCard = CreateCard(MainScroll, Dictionary[CurrentLang].InfJumpTitle, Dictionary[CurrentLang].InfJumpSub)
+local InfJumpBtn = Instance.new("TextButton")
+InfJumpBtn.Size = UDim2.new(0, 90, 0, 32)
+InfJumpBtn.Position = UDim2.new(1, -102, 0.5, -16)
+InfJumpBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 40)
+InfJumpBtn.Text = Dictionary[CurrentLang].BtnOff
+InfJumpBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+InfJumpBtn.Font = Enum.Font.GothamBold
+InfJumpBtn.TextSize = 12
+InfJumpBtn.Parent = InfJumpCard
+Instance.new("UICorner", InfJumpBtn).CornerRadius = UDim.new(0, 6)
+
+InfJumpBtn.MouseButton1Click:Connect(function()
+    infJumpEnabled = not infJumpEnabled
+    InfJumpBtn.BackgroundColor3 = infJumpEnabled and CurrentThemeColor or Color3.fromRGB(50, 40, 40)
+    InfJumpBtn.Text = infJumpEnabled and Dictionary[CurrentLang].BtnOn or Dictionary[CurrentLang].BtnOff
+    InfJumpBtn.TextColor3 = infJumpEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+end)
+
+UserInputService.JumpRequest:Connect(function()
+    if infJumpEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
+    end
+end)
+
+local noclipEnabled = false
+local NoclipCard = CreateCard(MainScroll, Dictionary[CurrentLang].NoclipTitle, Dictionary[CurrentLang].NoclipSub)
+local NoclipBtn = Instance.new("TextButton")
+NoclipBtn.Size = UDim2.new(0, 90, 0, 32)
+NoclipBtn.Position = UDim2.new(1, -102, 0.5, -16)
+NoclipBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 40)
+NoclipBtn.Text = Dictionary[CurrentLang].BtnOff
+NoclipBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+NoclipBtn.Font = Enum.Font.GothamBold
+NoclipBtn.TextSize = 12
+NoclipBtn.Parent = NoclipCard
+Instance.new("UICorner", NoclipBtn).CornerRadius = UDim.new(0, 6)
+
+NoclipBtn.MouseButton1Click:Connect(function()
+    noclipEnabled = not noclipEnabled
+    NoclipBtn.BackgroundColor3 = noclipEnabled and CurrentThemeColor or Color3.fromRGB(50, 40, 40)
+    NoclipBtn.Text = noclipEnabled and Dictionary[CurrentLang].BtnOn or Dictionary[CurrentLang].BtnOff
+    NoclipBtn.TextColor3 = noclipEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+end)
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled and LocalPlayer.Character then
+        for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+local InvisCard = CreateCard(MainScroll, Dictionary[CurrentLang].InvisTitle, Dictionary[CurrentLang].InvisSub)
+local InvisBtn = Instance.new("TextButton")
+InvisBtn.Size = UDim2.new(0, 90, 0, 32)
+InvisBtn.Position = UDim2.new(1, -102, 0.5, -16)
+InvisBtn.BackgroundColor3 = CurrentThemeColor
+InvisBtn.Text = Dictionary[CurrentLang].BtnEnable
+InvisBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+InvisBtn.Font = Enum.Font.GothamBold
+InvisBtn.TextSize = 12
+InvisBtn.Parent = InvisCard
+Instance.new("UICorner", InvisBtn).CornerRadius = UDim.new(0, 6)
+table.insert(AccentButtons, InvisBtn)
+
+InvisBtn.MouseButton1Click:Connect(function()
+    pcall(function()
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Awesome-Invisible-man-133400"))()
+    end)
+end)
+
+-- ------------------------------------------
+-- 4. TAB 2: ESP SYSTEM
+-- ------------------------------------------
+local playerEspEnabled, playerTracerEnabled = false, false
+local npcEspEnabled, npcTracerEnabled = false, false
+local playerHighlights, npcHighlights = {}, {}
+local playerLines, npcLines = {}, {}
+
+local EspPlayerCard = CreateCard(EspScroll, Dictionary[CurrentLang].EspPlayerTitle, Dictionary[CurrentLang].EspPlayerSub)
+local EspPlayerBtn = Instance.new("TextButton")
+EspPlayerBtn.Size = UDim2.new(0, 90, 0, 32)
+EspPlayerBtn.Position = UDim2.new(1, -102, 0.5, -16)
+EspPlayerBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 40)
+EspPlayerBtn.Text = Dictionary[CurrentLang].BtnOff
+EspPlayerBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+EspPlayerBtn.Font = Enum.Font.GothamBold
+EspPlayerBtn.TextSize = 12
+EspPlayerBtn.Parent = EspPlayerCard
+Instance.new("UICorner", EspPlayerBtn).CornerRadius = UDim.new(0, 6)
+
+EspPlayerBtn.MouseButton1Click:Connect(function()
+    playerEspEnabled = not playerEspEnabled
+    EspPlayerBtn.BackgroundColor3 = playerEspEnabled and CurrentThemeColor or Color3.fromRGB(50, 40, 40)
+    EspPlayerBtn.Text = playerEspEnabled and Dictionary[CurrentLang].BtnOn or Dictionary[CurrentLang].BtnOff
+    EspPlayerBtn.TextColor3 = playerEspEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+    if not playerEspEnabled then
+        for _, hl in pairs(playerHighlights) do if hl then hl:Destroy() end end
+        table.clear(playerHighlights)
+    end
+end)
+
+local EspPlayerTracerCard = CreateCard(EspScroll, Dictionary[CurrentLang].EspPlayerTracerTitle, Dictionary[CurrentLang].EspPlayerTracerSub)
+local EspPlayerTracerBtn = Instance.new("TextButton")
+EspPlayerTracerBtn.Size = UDim2.new(0, 90, 0, 32)
+EspPlayerTracerBtn.Position = UDim2.new(1, -102, 0.5, -16)
+EspPlayerTracerBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 40)
+EspPlayerTracerBtn.Text = Dictionary[CurrentLang].BtnOff
+EspPlayerTracerBtn.TextColor3 = Color3.fromRGB(200, 200, 200)
+EspPlayerTracerBtn.Font = Enum.Font.GothamBold
+EspPlayerTracerBtn.TextSize = 12
+EspPlayerTracerBtn.Parent = EspPlayerTracerCard
+Instance.new("UICorner", EspPlayerTracerBtn).CornerRadius = UDim.new(0, 6)
+
+EspPlayerTracerBtn.MouseButton1Click:Connect(function()
+    playerTracerEnabled = not playerTracerEnabled
+    EspPlayerTracerBtn.BackgroundColor3 = playerTracerEnabled and CurrentThemeColor or Color3.fromRGB(50, 40, 40)
+    EspPlayerTracerBtn.Text = playerTracerEnabled and Dictionary[CurrentLang].BtnOn or Dictionary[CurrentLang].BtnOff
+    EspPlayerTracerBtn.TextColor3 = playerTracerEnabled and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(200, 200, 200)
+    if not playerTracerEnabled then
+        for _, line in pairs(playerLines) do pcall(function() line:Remove() end) end
+        table.clear(playerLines)
+    end
+end)
+
+local EspNpcCard = CreateCard(EspScroll, Dictionary[CurrentLang].EspNpcTitle, Dictionary[CurrentLang].EspNpcSub)
+local EspNpcBtn = Instance.new("TextButton")
+EspNpcBtn.Size = UDim2.new(0, 90, 0, 32)
+EspNpcBtn.Position = UDim2.new(1, -102, 0.5, -16)
+EspNpcBtn.BackgroundColor3 = Color3.fromRGB(50, 40, 40)
+EspNpcBtn.Text = Dictionary[CurrentLang].BtnOff
+EspNpcBtn.TextColor3 = Color3.fromRGB(200, 
